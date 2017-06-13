@@ -31,7 +31,7 @@ class SpreadTrading(Environment):
         'short': np.array([0, 0, 1])
     }
 
-    def __init__(self, data_generator, spread_coefficients, game_length=1000, trading_fee=0, time_fee=0, history_length=2, record=False):
+    def __init__(self, data_generator, spread_coefficients, game_length=1000, trading_fee=0, time_fee=0, history_length=2):
         """Initialisation function
 
         Args:
