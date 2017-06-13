@@ -1,8 +1,8 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from openoutcry.core import Environment
-from openoutcry.utils import calc_spread
+from tgym.core import Environment
+from tgym.utils import calc_spread
 
 plt.style.use('dark_background')
 mpl.rcParams.update(
@@ -35,7 +35,7 @@ class SpreadTrading(Environment):
         """Initialisation function
 
         Args:
-            data_generator (openoutcry.core.DataGenerator): A data
+            data_generator (tgym.core.DataGenerator): A data
                 generator object yielding a 1D array of bid-ask prices.
             spread_coefficients (list): A list of signed integers defining
                 how much of each product to buy (positive) or sell (negative)

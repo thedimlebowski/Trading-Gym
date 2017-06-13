@@ -3,9 +3,9 @@ The aim of this file is to give a standalone example of how an environment  runs
 """
 
 import numpy as np
-from openoutcry.core import DataGenerator
-from openoutcry.envs import SpreadTrading
-from openoutcry.gens.deterministic import WavySignal
+from tgym.core import DataGenerator
+from tgym.envs import SpreadTrading
+from tgym.gens.deterministic import WavySignal
 
 generator = WavySignal(period_1=25, period_2=50, epsilon=-0.5)
 

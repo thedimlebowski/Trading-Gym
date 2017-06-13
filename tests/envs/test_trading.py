@@ -1,6 +1,6 @@
 import numpy as np
-from openoutcry.envs import SpreadTrading
-from openoutcry.gens import WavySignal
+from tgym.envs import SpreadTrading
+from tgym.gens import WavySignal
 
 
 class TestSpreadTrading(object):

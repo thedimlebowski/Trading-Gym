@@ -1,7 +1,7 @@
 import csv
 
 import numpy as np
-from openoutcry.core import DataGenerator
+from tgym.core import DataGenerator
 
 
 class CSVStreamer(DataGenerator):

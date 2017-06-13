@@ -1,6 +1,6 @@
-# Open Outcry
+# Trading Gym
 
-Open Outcry is an open-source project for the development of reinforcement learning algorithms in the context of trading.
+Trading Gym is an open-source project for the development of reinforcement learning algorithms in the context of trading.
 It is currently composed of a single environment and implements a generic way of feeding this trading environment different type of price data.
 
 ## The trading environment: `SpreadTrading`
@@ -11,12 +11,12 @@ It is currently composed of a single environment and implements a generic way of
 
 ## Create your own `DataGenerator`
 
-To create your own data generator, it must inherit from the `DataGenerator` base class which can be found in the file 'openoutcry/core.py'. It consists of four methods. Only the private `_generator` method which defines the times series needs to be overridden. Example can be found at `examples/generator_random.py`. For only one product, the `_generator` method **must** yield a `(bid, ask)` tuple, one element at a time. For two or more products, you must return a tuple consisting of bid and ask prices for each product, concatenated. For instance for two products, the method should yield `(bid_1, ask_1, bid_2, ask_2)`. The logic for the time series is encoded there.
+To create your own data generator, it must inherit from the `DataGenerator` base class which can be found in the file 'tgym/core.py'. It consists of four methods. Only the private `_generator` method which defines the times series needs to be overridden. Example can be found at `examples/generator_random.py`. For only one product, the `_generator` method **must** yield a `(bid, ask)` tuple, one element at a time. For two or more products, you must return a tuple consisting of bid and ask prices for each product, concatenated. For instance for two products, the method should yield `(bid_1, ask_1, bid_2, ask_2)`. The logic for the time series is encoded there.
 
 ## Compatibility with OpenAI gym
 
-Our environments API is strongly inspired by OpenAI gym. We aim to entirely base it upon OpenAI Gym architecture and add Open Outcry to the list of available OpenAI environments.
+Our environments API is strongly inspired by OpenAI gym. We aim to entirely base it upon OpenAI Gym architecture and add Trading Gym to the list of available OpenAI environments.
 
 ## Examples
 
-Some examples are available in `openoutcry/examples/`
+Some examples are available in `tgym/examples/`

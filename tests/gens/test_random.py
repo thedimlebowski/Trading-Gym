@@ -1,5 +1,5 @@
 import numpy as np
-from openoutcry.gens import AR1, RandomWalk
+from tgym.gens import AR1, RandomWalk
 
 
 def test_random_walk():

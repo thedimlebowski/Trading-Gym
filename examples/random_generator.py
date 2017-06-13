@@ -4,7 +4,7 @@ All generators inherit from the DataGenerator class
 The class yields tuple (bid_price,ask_price)
 """
 import numpy as np
-from openoutcry.core import DataGenerator
+from tgym.core import DataGenerator
 
 
 class RandomGenerator(DataGenerator):

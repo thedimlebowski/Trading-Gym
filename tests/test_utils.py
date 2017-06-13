@@ -1,5 +1,5 @@
 import numpy as np
-from openoutcry.utils import calc_spread
+from tgym.utils import calc_spread
 
 
 def test_calc_spread():
