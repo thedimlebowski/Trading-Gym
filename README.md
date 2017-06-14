@@ -3,6 +3,10 @@
 Trading Gym is an open-source project for the development of reinforcement learning algorithms in the context of trading.
 It is currently composed of a single environment and implements a generic way of feeding this trading environment different type of price data.
 
+## Installation
+
+`pip install tgym`
+
 ## The trading environment: `SpreadTrading`
 
 `SpreadTrading` is a trading environment allowing to trade a *spread* (see https://en.wikipedia.org/wiki/Spread_trade). We feed the environment a time series of prices (bid and ask) for *n* different products (with a `DataGenerator`), as well as a list of *spread coefficients*. The possible actions are then buying, selling or holding the spread. Actions cannot be taken on one or several legs in isolation. The state of the environment is defined as: prices, entry price and position (whether long, short or flat).
@@ -15,7 +19,7 @@ To create your own data generator, it must inherit from the `DataGenerator` base
 
 ## Compatibility with OpenAI gym
 
-Our environments API is strongly inspired by OpenAI gym. We aim to entirely base it upon OpenAI Gym architecture and add Trading Gym to the list of available OpenAI environments.
+Our environments API is strongly inspired by OpenAI gym. We aim to entirely base it upon OpenAI Gym architecture and propose Trading Gym as an additional OpenAI environment.
 
 ## Examples
 
