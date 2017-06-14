@@ -18,8 +18,7 @@ class CSVStreamer(DataGenerator):
                 yield np.array(row, dtype=np.float)
 
     def _iterator_end(self):
-        """Return the next element in the generator.
-        Rewinds if end of data reached.
+        """Rewinds if end of data reached.
         """
         print "End of data reached, rewinding."
         super(self.__class__, self).rewind()

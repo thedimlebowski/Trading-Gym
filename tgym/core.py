@@ -1,6 +1,6 @@
 
 
-class Environment(object):
+class Env(object):
     """Abstract class for an environment. Simplified OpenAI API.
     """
 
@@ -28,7 +28,7 @@ class Environment(object):
         """Reset the state of the environment and returns an initial observation.
 
         Returns:
-            observation (numpy.array): The initial observation of the space. Initial reward is assumed to be 0.
+            numpy.array: The initial observation of the space. Initial reward is assumed to be 0.
         """
         raise NotImplementedError()
 

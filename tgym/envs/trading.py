@@ -1,7 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from tgym.core import Environment
+from tgym.core import Env
 from tgym.utils import calc_spread
 
 plt.style.use('dark_background')
@@ -15,8 +15,8 @@ mpl.rcParams.update(
 )
 
 
-class SpreadTrading(Environment):
-    """Class for a discrete (buy/hold/sell) tuple spread trading environment.
+class SpreadTrading(Env):
+    """Class for a discrete (buy/hold/sell) spread trading environment.
     """
 
     _actions = {
@@ -90,6 +90,17 @@ class SpreadTrading(Environment):
 
     def step(self, action):
         """Take an action (buy/sell/hold) and computes the immediate reward.
+
+        Args:
+            action (numpy.array): Action to be taken, one-hot encoded.
+
+        Returns:
+            tuple:
+                - observation (numpy.array): Agent's observation of the current environment.
+                - reward (float) : Amount of reward returned after previous action.
+                - done (bool): Whether the episode has ended, in which case further step() calls will return undefined results.
+                - info (str): Contains auxiliary diagnostic information (helpful for debugging, and sometimes learning).
+
         """
 
         assert any([(action == x).all() for x in self._actions.values()])

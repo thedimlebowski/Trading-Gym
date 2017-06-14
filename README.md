@@ -19,7 +19,7 @@ To create your own data generator, it must inherit from the `DataGenerator` base
 
 ## Compatibility with OpenAI gym
 
-Our environments API is strongly inspired by OpenAI gym. We aim to entirely base it upon OpenAI Gym architecture and propose Trading Gym as an additional OpenAI environment.
+Our environments API is strongly inspired by OpenAI Gym. We aim to entirely base it upon OpenAI Gym architecture and propose Trading Gym as an additional OpenAI environment.
 
 ## Examples
 
