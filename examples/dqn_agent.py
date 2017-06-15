@@ -79,9 +79,9 @@ class DQNAgent:
             q_target = self.brain.predict(state)
             q_target[action[0],action[1]] = reward
             return self.brain.fit(state,q_target,
-                           batch_size=self.batch_size,
-                           epochs=1,
-                           verbose=False)
+                                  batch_size=self.batch_size,
+                                  epochs=1,
+                                  verbose=False)
 
     def end(self):
         pass
