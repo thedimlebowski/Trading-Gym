@@ -10,7 +10,7 @@ mpl.rcParams.update(
         "font.size": 15,
         "axes.labelsize": 15,
         "lines.linewidth": 1,
-        "lines.markersize": 3
+        "lines.markersize": 10
     }
 )
 
