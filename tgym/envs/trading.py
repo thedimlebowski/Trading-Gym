@@ -10,7 +10,7 @@ mpl.rcParams.update(
         "font.size": 15,
         "axes.labelsize": 15,
         "lines.linewidth": 1,
-        "lines.markersize": 5
+        "lines.markersize": 3
     }
 )
 
@@ -194,10 +194,10 @@ class SpreadTrading(Env):
 
         ymin, ymax = self._ax[-1].get_ylim()
         yrange = ymax - ymin
-        if (self._action == self._actions['buy']).all():
+        if (self._action == self._actions['sell']).all():
             self._ax[-1].scatter(self._iteration + 0.5, bid + 0.03 *
                                  yrange, color='orangered', marker='v')
-        elif (self._action == self._actions['sell']).all():
+        elif (self._action == self._actions['buy']).all():
             self._ax[-1].scatter(self._iteration + 0.5, ask - 0.03 *
                                  yrange, color='lawngreen', marker='^')
         plt.suptitle('Cumulated Reward: ' + "%.2f" % self._total_reward + ' ~ ' +
