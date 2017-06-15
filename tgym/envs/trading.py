@@ -9,8 +9,8 @@ mpl.rcParams.update(
     {
         "font.size": 15,
         "axes.labelsize": 15,
-        "lines.linewidth": 2,
-        "lines.markersize": 15
+        "lines.linewidth": 1,
+        "lines.markersize": 5
     }
 )
 
@@ -60,16 +60,11 @@ class SpreadTrading(Env):
         self.reset()
 
     def reset(self):
-        """Reset the trading environment. Reset rewards, data generator,
-        observation buffer etc.
+        """Reset the trading environment. Reset rewards, data generator...
 
         Returns:
             observation (numpy.array): observation of the state
         """
-        self._buffer = {
-            'observations': [],
-            'actions': []
-        }  # For rendering
         self._iteration = 0
         self._data_generator.rewind()
         self._total_reward = 0
@@ -79,13 +74,10 @@ class SpreadTrading(Env):
         self._exit_price = 0
 
         for i in range(self._history_length):
-            # TODO: self._prices_history and self._buffer['observations'] are redondant
             self._prices_history.append(self._data_generator.next())
             observation = self._get_observation()
             self.state_shape = observation.shape
-            self._buffer['observations'].append(observation)
             self._action = self._actions['hold']
-            self._buffer['actions'].append(self._action)
         return observation
 
     def step(self, action):
@@ -105,7 +97,6 @@ class SpreadTrading(Env):
 
         assert any([(action == x).all() for x in self._actions.values()])
         self._action = action
-        self._buffer['actions'].append(self._action)
         self._iteration += 1
 
         reward = -self._time_fee
@@ -162,7 +153,6 @@ class SpreadTrading(Env):
             info['status'] = 'Time out.'
 
         observation = self._get_observation()
-        self._buffer['observations'].append(observation)
         return observation, reward, done, info
 
     def render(self, savefig=False, filename='myfig'):
@@ -172,9 +162,6 @@ class SpreadTrading(Env):
             savefig (bool): Whether to save the figure as an image or not.
             filename (str): Name of the image file.
         """
-        iterations = np.arange(max(0, self._iteration + self._history_length - 80),
-                               self._iteration + self._history_length)
-
         if self._first_render:
             self._f, self._ax = plt.subplots(
                 len(self._spread_coefficients) + int(len(self._spread_coefficients) > 1),
@@ -187,45 +174,39 @@ class SpreadTrading(Env):
         if len(self._spread_coefficients) > 1:
             # TODO: To be checked
             for prod_i in range(len(self._spread_coefficients)):
-                bid = np.array(
-                    map(lambda i: self._buffer['observations'][i][-4 - 2 * len(self._spread_coefficients) + 2 * prod_i], iterations))
-                ask = np.array(
-                    map(lambda i: self._buffer['observations'][i][-4 - 2 * len(self._spread_coefficients) + 2 * prod_i + 1], iterations))
+                bid = self._prices_history[-1][2 * prod_i]
+                ask = self._prices_history[-1][2 * prod_i + 1]
                 self._ax[prod_i].clear()
-                self._ax[prod_i].scatter(
-                    iterations, bid, color='white', marker='_', linewidth=3)
-                self._ax[prod_i].scatter(
-                    iterations, ask, color='white', marker='_', linewidth=3)
+                self._ax[prod_i].plot([self._iteration, self._iteration + 1],
+                                      [bid, bid], color='white')
+                self._ax[prod_i].plot([self._iteration, self._iteration + 1],
+                                      [ask, ask], color='white')
                 self._ax[prod_i].set_title('Product {} (spread coef {})'.format(
                     prod_i, str(self._spread_coefficients[prod_i])))
 
-        actions = np.array(map(lambda i: self._buffer['actions'][i], iterations))
-
-        sell_indices = np.where(map(np.all, actions == np.array(self._actions['sell'])))
-        buy_indices = np.where(map(np.all, actions == np.array(self._actions['buy'])))
         # Spread price
-        prices = map(lambda i: self._buffer['observations'][i]
-                     [-4 - 2 * len(self._spread_coefficients):-4], iterations)
-        bid_ask = map(lambda price: calc_spread(price, self._spread_coefficients), prices)
-        bid = np.array(map(lambda x: x[0], bid_ask))
-        ask = np.array(map(lambda x: x[1], bid_ask))
-        self._ax[-1].clear()
-        self._ax[-1].scatter(iterations, bid, color='white', marker='_')
-        self._ax[-1].scatter(iterations, ask, color='white', marker='_')
+        prices = self._prices_history[-1]
+        bid, ask = calc_spread(prices, self._spread_coefficients)
+        self._ax[-1].plot([self._iteration, self._iteration + 1],
+                          [bid, bid], color='white')
+        self._ax[-1].plot([self._iteration, self._iteration + 1],
+                          [ask, ask], color='white')
 
         ymin, ymax = self._ax[-1].get_ylim()
         yrange = ymax - ymin
-        self._ax[-1].scatter(iterations[sell_indices] - 1,
-                             bid[map(lambda x: x - 1, sell_indices)] + 0.03 * yrange, color='orangered', marker='v')
-        self._ax[-1].scatter(iterations[buy_indices] - 1,
-                             ask[map(lambda x: x - 1, buy_indices)] - 0.03 * yrange, color='lawngreen', marker='^')
+        if (self._action == self._actions['buy']).all():
+            self._ax[-1].scatter(self._iteration + 0.5, bid + 0.03 *
+                                 yrange, color='orangered', marker='v')
+        elif (self._action == self._actions['sell']).all():
+            self._ax[-1].scatter(self._iteration + 0.5, ask - 0.03 *
+                                 yrange, color='lawngreen', marker='^')
         plt.suptitle('Cumulated Reward: ' + "%.2f" % self._total_reward + ' ~ ' +
                      'Cumulated PnL: ' + "%.2f" % self._total_pnl + ' ~ ' +
                      'Position: ' + ['flat', 'long', 'short'][list(self._position).index(1)] + ' ~ ' +
                      'Entry Price: ' + "%.2f" % self._entry_price)
         self._f.tight_layout()
-        plt.xticks(range(iterations[-1])[::5])
-        plt.xlim([iterations[0], iterations[-1]])
+        plt.xticks(range(self._iteration)[::5])
+        plt.xlim([max(0, self._iteration - 80.5), self._iteration + 0.5])
         plt.subplots_adjust(top=0.85)
         plt.pause(0.01)
         if savefig:
@@ -264,4 +245,4 @@ class SpreadTrading(Env):
         Returns:
             numpy.array: array with a 1 on the action index, 0 elsewhere.
         """
-        return np.random.multinomial(1, [0.8, 0.1, 0.1])
+        return np.random.multinomial(1, [1, 0.1, 0.1])
