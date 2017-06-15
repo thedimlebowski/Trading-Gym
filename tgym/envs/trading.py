@@ -10,7 +10,7 @@ mpl.rcParams.update(
         "font.size": 15,
         "axes.labelsize": 15,
         "lines.linewidth": 1,
-        "lines.markersize": 10
+        "lines.markersize": 8
     }
 )
 
@@ -57,6 +57,7 @@ class SpreadTrading(Env):
         self.n_actions = 3
         self._prices_history = []
         self._history_length = history_length
+        self._price_range = 0
         self.reset()
 
     def reset(self):
@@ -193,7 +194,7 @@ class SpreadTrading(Env):
                           [ask, ask], color='white')
 
         ymin, ymax = self._ax[-1].get_ylim()
-        yrange = ymax - ymin
+        yrange = max(self._price_range, ymax - ymin)
         if (self._action == self._actions['sell']).all():
             self._ax[-1].scatter(self._iteration + 0.5, bid + 0.03 *
                                  yrange, color='orangered', marker='v')
