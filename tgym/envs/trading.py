@@ -245,4 +245,4 @@ class SpreadTrading(Env):
         Returns:
             numpy.array: array with a 1 on the action index, 0 elsewhere.
         """
-        return np.random.multinomial(1, [1, 0.1, 0.1])
+        return np.random.multinomial(1, [0.8, 0.1, 0.1])
