@@ -64,33 +64,27 @@ class DQNAgent:
         return action
 
     def observe(self, state, action, reward, next_state, done,warming_up=False):
-        """Memory Management and training schedule of the agent
+        """Memory Management and training of the agent
         """
         self.i = (self.i+1) % self.memory_size
         self.memory[self.i] = (state, action, reward, next_state, done)
         if (not warming_up) and (self.i % self.train_interval)==0 :
             if self.epsilon > self.epsilon_min:
                 self.epsilon -= self.epsilon_increment
-            return self._iterate()
-
+            state, action, reward, next_state, done = self._get_batches()
+            reward += (self.gamma
+                       * np.logical_not(done)
+                       * np.amax(self.brain.predict(next_state),
+                       axis=1))
+            q_target = self.brain.predict(state)
+            q_target[action[0],action[1]] = reward
+            return self.brain.fit(state,q_target,
+                           batch_size=self.batch_size,
+                           epochs=1,
+                           verbose=False)
 
     def end(self):
         pass
-
-    def _iterate(self):
-        """Training of the agent
-        """
-        state, action, reward, next_state, done = self._get_batches()
-        reward += (self.gamma
-                   * np.logical_not(done)
-                   * np.amax(self.brain.predict(next_state),
-                   axis=1))
-        q_target = self.brain.predict(state)
-        q_target[action[0],action[1]] = reward
-        return self.brain.fit(state,q_target,
-                       batch_size=self.batch_size,
-                       epochs=1,
-                       verbose=False)
 
     def _get_batches(self):
         """Selecting a batch of memory
