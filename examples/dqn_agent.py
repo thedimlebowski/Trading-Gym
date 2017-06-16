@@ -1,4 +1,8 @@
 """
+In this example we demonstrate how to implement a DQN agent and
+train it to trade optimally on a periodic price signal.
+Training time is short and results are unstable. 
+Do not hesitate to run several times tweak parameters to get better results.
 Inspired from https://github.com/keon/deep-q-learning
 """
 import gym
@@ -7,7 +11,7 @@ import random
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
-from tgym.envs.trading import SpreadTrading
+from tgym.envs import SpreadTrading
 
 class DQNAgent:
     def __init__(self,
@@ -29,8 +33,8 @@ class DQNAgent:
         self.gamma = gamma
         self.epsilon = 1.0
         self.epsilon_min = epsilon_min
-        self.epsilon_increment = 1.1*(1-epsilon_min)*train_interval\
-                                 /(episodes*game_length)
+        self.epsilon_decrement = (self.epsilon-epsilon_min)\
+            *train_interval/(episodes*game_length) #linear decrease rate
         self.learning_rate = learning_rate
         self.train_interval = train_interval
         self.batch_size = batch_size
@@ -41,12 +45,12 @@ class DQNAgent:
         """Build the agent's brain
         """
         brain = Sequential()
-        nbr_layers = 24
+        neurons_per_layer = 24
         activation = "relu"
-        brain.add(Dense(nbr_layers,
+        brain.add(Dense(neurons_per_layer,
                         input_dim=self.state_size,
                         activation=activation))
-        brain.add(Dense(nbr_layers, activation=activation))
+        brain.add(Dense(neurons_per_layer, activation=activation))
         brain.add(Dense(self.action_size, activation='linear'))
         brain.compile(loss='mse',optimizer=Adam(lr=self.learning_rate))
         return brain
@@ -70,21 +74,18 @@ class DQNAgent:
         self.memory[self.i] = (state, action, reward, next_state, done)
         if (not warming_up) and (self.i % self.train_interval)==0 :
             if self.epsilon > self.epsilon_min:
-                self.epsilon -= self.epsilon_increment
+                self.epsilon -= self.epsilon_decrement
             state, action, reward, next_state, done = self._get_batches()
             reward += (self.gamma
-                       * np.logical_not(done)
-                       * np.amax(self.brain.predict(next_state),
-                       axis=1))
+                * np.logical_not(done)
+                * np.amax(self.brain.predict(next_state),
+                axis=1))
             q_target = self.brain.predict(state)
             q_target[action[0],action[1]] = reward
             return self.brain.fit(state,q_target,
                                   batch_size=self.batch_size,
                                   epochs=1,
                                   verbose=False)
-
-    def end(self):
-        pass
 
     def _get_batches(self):
         """Selecting a batch of memory
@@ -93,12 +94,12 @@ class DQNAgent:
         """
         batch = np.array(random.sample(self.memory, self.batch_size))
         state_batch = np.concatenate(batch[:,0])\
-                      .reshape(self.batch_size,self.state_size)
+            .reshape(self.batch_size,self.state_size)
         action_batch = np.concatenate(batch[:,1])\
-                    .reshape(self.batch_size,self.action_size)
+            .reshape(self.batch_size,self.action_size)
         reward_batch = batch[:,2]
         next_state_batch = np.concatenate(batch[:,3])\
-                           .reshape(self.batch_size,self.state_size)
+            .reshape(self.batch_size,self.state_size)
         done_batch = batch[:,4]
         # action processing
         action_batch = np.where(action_batch==1)
@@ -106,10 +107,8 @@ class DQNAgent:
 
 
 if __name__=="__main__":
-    import numpy as np
     import matplotlib.pyplot as plt
 
-    from tgym.core import DataGenerator
     from tgym.envs import SpreadTrading
     from tgym.gens.deterministic import WavySignal
     # Instantiating the environmnent
@@ -161,9 +160,9 @@ if __name__=="__main__":
             state = next_state
             rew+=reward
         print("Ep:"+str(ep)
-              +"| rew:"+str(round(rew,2))
-              +"| eps:"+str(round(agent.epsilon,2))
-              +"| loss:"+str(round(loss.history["loss"][0],4)))
+            +"| rew:"+str(round(rew,2))
+            +"| eps:"+str(round(agent.epsilon,2))
+            +"| loss:"+str(round(loss.history["loss"][0],4)))
     # Running the agent
     done = False
     state = environment.reset()
