@@ -1,8 +1,8 @@
 """
 In this example we demonstrate how to implement a DQN agent and
 train it to trade optimally on a periodic price signal.
-Training time is short and results are unstable. 
-Do not hesitate to run several times tweak parameters to get better results.
+Training time is short and results are unstable.
+Do not hesitate to run several times and/or tweak parameters to get better results.
 Inspired from https://github.com/keon/deep-q-learning
 """
 import gym
