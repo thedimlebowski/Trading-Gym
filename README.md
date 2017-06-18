@@ -28,6 +28,7 @@ Some examples are available in `tgym/examples/`
 To run the dqn_agent example, you will need to also install the following:
 
 `pip install gym`
+
 `pip install keras`
 
 And install you favorite backend, such as tensorflow or theano:
