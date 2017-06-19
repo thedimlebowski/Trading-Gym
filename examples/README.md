@@ -1,10 +1,10 @@
 # Examples
 
-## Random Generator: `examples/random_generator.py`
+## Random Generator: `random_generator.py`
 
 This example shows how to implement a simple data generator returning a list of random prices.
 
-## Trading environment: `examples/trading_environment.py`
+## Trading environment: `trading_environment.py`
 
 This example runs the trading environment in interactive mode. The environment can take as input three possible actions: Buy, sell and hold. At each step, the environment returns a state composed of:
 - current prices, 
@@ -21,7 +21,7 @@ This example runs the trading environment in interactive mode. The environment c
 
 The time series can be observed with the `render` method.
 
-## DQN agent: `examples/dqn_agent.py`
+## DQN agent: `dqn_agent.py`
 
 As an example, we implement a value-based Q-learning algorithm that learns to trade a periodic signal. Run `python examples/dqn_agent.py` to launch it. Once the learning process is over, the learned strategy is displayed as live time series. Trades are represented by colored (green for buy, red for sell) triangles. Once run, the agent will have learned to buy (sell) at local minima (maxima). Note that the parameters have been set for the agent to learn quickly and we do not wait for full convergence. Feel free to run the program several times and to tweak the parameters to try and find the globally optimal strategy.
 
