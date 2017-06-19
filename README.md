@@ -25,12 +25,4 @@ Our environments API is strongly inspired by OpenAI Gym. We aim to entirely base
 
 Some examples are available in `tgym/examples/`
 
-To run the dqn_agent example, you will need to also install the following:
-
-`pip install gym`
-
-`pip install keras`
-
-And install your favorite backend, such as tensorflow or theano:
-
-`pip install tensorflow`
+To run the `dqn_agent.py` example, you will need to also install keras with `pip install keras`. By default, the backend will be set to Theano. You can also run it with Tensorflow by installing it with `pip install tensorflow`. You then need to edit `~/.keras/keras.json` and make sure `"backend": "tensorflow"` is specified.
