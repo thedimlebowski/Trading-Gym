@@ -48,6 +48,7 @@ class SpreadTrading(Env):
         """
 
         assert data_generator.n_products == len(spread_coefficients)
+        assert history_length > 0
         self._data_generator = data_generator
         self._spread_coefficients = spread_coefficients
         self._first_render = True
@@ -76,9 +77,10 @@ class SpreadTrading(Env):
 
         for i in range(self._history_length):
             self._prices_history.append(self._data_generator.next())
-            observation = self._get_observation()
-            self.state_shape = observation.shape
-            self._action = self._actions['hold']
+        
+        observation = self._get_observation()
+        self.state_shape = observation.shape
+        self._action = self._actions['hold']
         return observation
 
     def step(self, action):
