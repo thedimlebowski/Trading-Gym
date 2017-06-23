@@ -5,7 +5,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='tgym',
-    version='0.1.1',
+    version='0.1.11',
     description="Trading Gym is an open-source project for the development of reinforcement learning algorithms in the context of trading.",
     author="Prediction Machines",
     author_email='tgym@prediction-machines.com',
