@@ -1,8 +1,9 @@
+from tgym.core import Env
+from tgym.utils import calc_spread
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-from tgym.core import Env
-from tgym.utils import calc_spread
 
 plt.style.use('dark_background')
 mpl.rcParams.update(
@@ -77,7 +78,7 @@ class SpreadTrading(Env):
 
         for i in range(self._history_length):
             self._prices_history.append(self._data_generator.next())
-        
+
         observation = self._get_observation()
         self.state_shape = observation.shape
         self._action = self._actions['hold']
@@ -179,7 +180,6 @@ class SpreadTrading(Env):
             for prod_i in range(len(self._spread_coefficients)):
                 bid = self._prices_history[-1][2 * prod_i]
                 ask = self._prices_history[-1][2 * prod_i + 1]
-                self._ax[prod_i].clear()
                 self._ax[prod_i].plot([self._iteration, self._iteration + 1],
                                       [bid, bid], color='white')
                 self._ax[prod_i].plot([self._iteration, self._iteration + 1],

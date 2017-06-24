@@ -7,10 +7,11 @@ Inspired from https://github.com/keon/deep-q-learning
 """
 import random
 
-import numpy as np
 from keras.layers import Dense
 from keras.models import Sequential
 from keras.optimizers import Adam
+
+import numpy as np
 from tgym.envs import SpreadTrading
 
 

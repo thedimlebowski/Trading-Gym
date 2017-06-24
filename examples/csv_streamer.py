@@ -1,7 +1,7 @@
 from tgym.envs import SpreadTrading
 from tgym.gens import CSVStreamer
 
-generator = CSVStreamer(filename='./examples/coinbaseUSD.csv')
+generator = CSVStreamer(filename='./examples/price_1.csv')
 
 game_length = 200
 
