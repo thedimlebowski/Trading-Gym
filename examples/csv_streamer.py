@@ -1,13 +1,13 @@
 from tgym.envs import SpreadTrading
 from tgym.gens import CSVStreamer
 
-generator = CSVStreamer(filename='./examples/price_1.csv')
+generator = CSVStreamer(filename='./examples/price_2.csv')
 
-game_length = 200
+episode_length = 200
 
-environment = SpreadTrading(spread_coefficients=[1],
+environment = SpreadTrading(spread_coefficients=[2, -1],
                             data_generator=generator,
-                            game_length=game_length)
+                            episode_length=episode_length)
 
 environment.render()
 while True:
