@@ -9,7 +9,7 @@ from tgym.gens.deterministic import WavySignal
 
 generator = WavySignal(period_1=25, period_2=50, epsilon=-0.5)
 
-game_length = 200
+episode_length = 200
 trading_fee = 0.2
 time_fee = 0
 # history_length number of historical states in the observation vector.
@@ -20,7 +20,7 @@ environment = SpreadTrading(spread_coefficients=[1],
                             trading_fee=trading_fee,
                             time_fee=time_fee,
                             history_length=history_length,
-                            game_length=game_length)
+                            episode_length=episode_length)
 
 environment.render()
 while True:

@@ -9,7 +9,7 @@ class TestSpreadTrading(object):
     st = SpreadTrading(
         data_generator=data_generator,
         spread_coefficients=[1],
-        game_length=1000,
+        episode_length=1000,
         trading_fee=0.2,
         time_fee=0.1,
         history_length=1
@@ -21,7 +21,7 @@ class TestSpreadTrading(object):
         assert self.st._first_render
         assert self.st._trading_fee == 0.2
         assert self.st._time_fee == 0.1
-        assert self.st._game_length == 1000
+        assert self.st._episode_length == 1000
         assert self.st.n_actions == 3
         assert self.st._history_length == 1
         assert len(self.st._prices_history) == 1
