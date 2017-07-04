@@ -6,13 +6,18 @@ from tgym.core import DataGenerator
 
 class CSVStreamer(DataGenerator):
     """Data generator from csv file.
-    The csv file should have headers but no index columns.
+    The csv file should no index columns.
+
+    Args:
+        filename (str): Filepath to a csv file.
+        header (bool): True if the file has got a header, False otherwise
     """
     @staticmethod
-    def _generator(filename):
+    def _generator(filename, header=False):
         with open(filename, "rb") as csvfile:
             reader = csv.reader(csvfile)
-            next(reader, None)
+            if header:
+                next(reader, None)
             for row in reader:
                 assert len(row) % 2 == 0
                 yield np.array(row, dtype=np.float)
