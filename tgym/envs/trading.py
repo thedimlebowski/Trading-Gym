@@ -31,7 +31,7 @@ class SpreadTrading(Env):
         'short': np.array([0, 0, 1])
     }
 
-    def __init__(self, data_generator, spread_coefficients, game_length=1000, trading_fee=0, time_fee=0, history_length=2):
+    def __init__(self, data_generator, spread_coefficients, episode_length=1000, trading_fee=0, time_fee=0, history_length=2):
         """Initialisation function
 
         Args:
@@ -40,7 +40,7 @@ class SpreadTrading(Env):
             spread_coefficients (list): A list of signed integers defining
                 how much of each product to buy (positive) or sell (negative)
                 when buying or selling the spread.
-            game_length (int): number of steps to play the game for
+            episode_length (int): number of steps to play the game for
             trading_fee (float): penalty for trading
             time_fee (float): time fee
             history_length (int): number of historical states to stack in the
@@ -48,16 +48,16 @@ class SpreadTrading(Env):
         """
 
         assert data_generator.n_products == len(spread_coefficients)
+        assert history_length > 0
         self._data_generator = data_generator
         self._spread_coefficients = spread_coefficients
         self._first_render = True
         self._trading_fee = trading_fee
         self._time_fee = time_fee
-        self._game_length = game_length
+        self._episode_length = episode_length
         self.n_actions = 3
         self._prices_history = []
         self._history_length = history_length
-        self._price_range = 0
         self.reset()
 
     def reset(self):
@@ -76,9 +76,10 @@ class SpreadTrading(Env):
 
         for i in range(self._history_length):
             self._prices_history.append(self._data_generator.next())
-            observation = self._get_observation()
-            self.state_shape = observation.shape
-            self._action = self._actions['hold']
+
+        observation = self._get_observation()
+        self.state_shape = observation.shape
+        self._action = self._actions['hold']
         return observation
 
     def step(self, action):
@@ -92,33 +93,27 @@ class SpreadTrading(Env):
                 - observation (numpy.array): Agent's observation of the current environment.
                 - reward (float) : Amount of reward returned after previous action.
                 - done (bool): Whether the episode has ended, in which case further step() calls will return undefined results.
-                - info (str): Contains auxiliary diagnostic information (helpful for debugging, and sometimes learning).
+                - info (dict): Contains auxiliary diagnostic information (helpful for debugging, and sometimes learning).
 
         """
 
         assert any([(action == x).all() for x in self._actions.values()])
         self._action = action
         self._iteration += 1
-
-        reward = -self._time_fee
+        done = False
         instant_pnl = 0
         info = {}
-        done = False
+        reward = -self._time_fee
         if all(action == self._actions['buy']):
             reward -= self._trading_fee
             if all(self._position == self._positions['flat']):
                 self._position = self._positions['long']
                 self._entry_price = calc_spread(
                     self._prices_history[-1], self._spread_coefficients)[1]  # Ask
-                info['entry_price'] = self._entry_price
-                info['action'] = ['hold', 'buy', 'sell'][list(action).index(1)]
             elif all(self._position == self._positions['short']):
                 self._exit_price = calc_spread(
                     self._prices_history[-1], self._spread_coefficients)[1]  # Ask
-                info['exit_price'] = self._exit_price
-                info['action'] = ['hold', 'buy', 'sell'][list(action).index(1)]
-                instant_pnl = self._calc_int_pnl()
-                info['instant_pnl'] = instant_pnl
+                instant_pnl = self._entry_price - self._exit_price
                 self._position = self._positions['flat']
                 self._entry_price = 0
         elif all(action == self._actions['sell']):
@@ -127,15 +122,10 @@ class SpreadTrading(Env):
                 self._position = self._positions['short']
                 self._entry_price = calc_spread(
                     self._prices_history[-1], self._spread_coefficients)[0]  # Bid
-                info['entry_price'] = self._entry_price
-                info['action'] = ['hold', 'buy', 'sell'][list(action).index(1)]
             elif all(self._position == self._positions['long']):
                 self._exit_price = calc_spread(
                     self._prices_history[-1], self._spread_coefficients)[0]  # Bid
-                info['exit_price'] = self._exit_price
-                info['action'] = ['hold', 'buy', 'sell'][list(action).index(1)]
-                instant_pnl = self._calc_int_pnl()
-                info['instant_pnl'] = instant_pnl
+                instant_pnl = self._exit_price - self._entry_price
                 self._position = self._positions['flat']
                 self._entry_price = 0
 
@@ -149,7 +139,7 @@ class SpreadTrading(Env):
         except StopIteration:
             done = True
             info['status'] = 'No more data.'
-        if self._iteration >= self._game_length:
+        if self._iteration >= self._episode_length:
             done = True
             info['status'] = 'Time out.'
 
@@ -177,7 +167,6 @@ class SpreadTrading(Env):
             for prod_i in range(len(self._spread_coefficients)):
                 bid = self._prices_history[-1][2 * prod_i]
                 ask = self._prices_history[-1][2 * prod_i + 1]
-                self._ax[prod_i].clear()
                 self._ax[prod_i].plot([self._iteration, self._iteration + 1],
                                       [bid, bid], color='white')
                 self._ax[prod_i].plot([self._iteration, self._iteration + 1],
@@ -192,9 +181,8 @@ class SpreadTrading(Env):
                           [bid, bid], color='white')
         self._ax[-1].plot([self._iteration, self._iteration + 1],
                           [ask, ask], color='white')
-
         ymin, ymax = self._ax[-1].get_ylim()
-        yrange = max(self._price_range, ymax - ymin)
+        yrange = ymax - ymin
         if (self._action == self._actions['sell']).all():
             self._ax[-1].scatter(self._iteration + 0.5, bid + 0.03 *
                                  yrange, color='orangered', marker='v')
@@ -208,6 +196,7 @@ class SpreadTrading(Env):
         self._f.tight_layout()
         plt.xticks(range(self._iteration)[::5])
         plt.xlim([max(0, self._iteration - 80.5), self._iteration + 0.5])
+        plt.ylim([-1.1, 1.1])
         plt.subplots_adjust(top=0.85)
         plt.pause(0.01)
         if savefig:
@@ -226,17 +215,6 @@ class SpreadTrading(Env):
                 np.array(self._position)
             ]
         )
-
-    def _calc_int_pnl(self):
-        """Calculate the PnL at each position closed.
-
-        Returns:
-            float: pnl for this closed trade
-        """
-        if all(self._position == self._positions['long']):
-            return self._exit_price - self._entry_price
-        if all(self._position == self._positions['short']):
-            return self._entry_price - self._exit_price
 
     @staticmethod
     def random_action_fun():

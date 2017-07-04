@@ -19,7 +19,7 @@ class DQNAgent:
                  state_size,
                  action_size,
                  episodes,
-                 game_length,
+                 episode_length,
                  memory_size=2000,
                  train_interval=100,
                  gamma=0.95,
@@ -35,7 +35,7 @@ class DQNAgent:
         self.epsilon = 1.0
         self.epsilon_min = epsilon_min
         self.epsilon_decrement = (self.epsilon - epsilon_min)\
-            * train_interval / (episodes * game_length)  # linear decrease rate
+            * train_interval / (episodes * episode_length)  # linear decrease rate
         self.learning_rate = learning_rate
         self.train_interval = train_interval
         self.batch_size = batch_size
@@ -114,8 +114,8 @@ if __name__ == "__main__":
     from tgym.gens.deterministic import WavySignal
     # Instantiating the environmnent
     generator = WavySignal(period_1=25, period_2=50, epsilon=-0.5)
-    episodes = 20
-    game_length = 400
+    episodes = 50
+    episode_length = 400
     trading_fee = .2
     time_fee = 0
     history_length = 2
@@ -124,7 +124,7 @@ if __name__ == "__main__":
                                 trading_fee=trading_fee,
                                 time_fee=time_fee,
                                 history_length=history_length,
-                                game_length=game_length)
+                                episode_length=episode_length)
     state = environment.reset()
     # Instantiating the agent
     memory_size = 3000
@@ -139,7 +139,7 @@ if __name__ == "__main__":
                      action_size=action_size,
                      memory_size=memory_size,
                      episodes=episodes,
-                     game_length=game_length,
+                     episode_length=episode_length,
                      train_interval=train_interval,
                      gamma=gamma,
                      learning_rate=learning_rate,
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     for ep in range(episodes):
         state = environment.reset()
         rew = 0
-        for _ in range(game_length):
+        for _ in range(episode_length):
             action = agent.act(state)
             next_state, reward, done, _ = environment.step(action)
             loss = agent.observe(state, action, reward, next_state, done)
