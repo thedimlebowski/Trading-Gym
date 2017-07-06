@@ -203,7 +203,6 @@ class SpreadTrading(Env):
         self._f.tight_layout()
         plt.xticks(range(self._iteration)[::5])
         plt.xlim([max(0, self._iteration - 80.5), self._iteration + 0.5])
-        #plt.ylim([-1.1, 1.1])
         plt.subplots_adjust(top=0.85)
         plt.pause(0.01)
         if savefig:
