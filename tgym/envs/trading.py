@@ -73,6 +73,7 @@ class SpreadTrading(Env):
         self._position = self._positions['flat']
         self._entry_price = 0
         self._exit_price = 0
+        self._closed_plot = False
 
         for i in range(self._history_length):
             self._prices_history.append(self._data_generator.next())
@@ -142,9 +143,14 @@ class SpreadTrading(Env):
         if self._iteration >= self._episode_length:
             done = True
             info['status'] = 'Time out.'
+        if self._closed_plot:
+            info['status'] = 'Closed plot'
 
         observation = self._get_observation()
         return observation, reward, done, info
+    
+    def _handle_close(self, evt):
+        self._closed_plot = True
 
     def render(self, savefig=False, filename='myfig'):
         """Matlplotlib rendering of each step.
@@ -162,6 +168,7 @@ class SpreadTrading(Env):
                 self._ax = [self._ax]
             self._f.set_size_inches(12, 6)
             self._first_render = False
+            self._f.canvas.mpl_connect('close_event', self._handle_close)
         if len(self._spread_coefficients) > 1:
             # TODO: To be checked
             for prod_i in range(len(self._spread_coefficients)):
