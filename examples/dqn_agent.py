@@ -169,5 +169,8 @@ if __name__ == "__main__":
     state = environment.reset()
     while not done:
         action = agent.act(state)
-        state, _, done, _ = environment.step(action)
-        environment.render()
+        state, _, done, info = environment.step(action)
+        if 'status' in info and info['status'] == 'Closed plot':
+            done = True
+        else:
+            environment.render()
